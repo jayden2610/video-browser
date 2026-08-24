@@ -63,6 +63,16 @@ Options:
 3. Serves the actual media files at `/file/...` with range request support
 4. `index.html` is a single-file dark-themed web UI that fetches the API and renders a browsable grid
 
+## Use with video-use
+
+When working on video projects (e.g. video-use, hyperframes), run the browser in the background to preview and manage source files:
+
+```bash
+python server.py C:\path\to\video\project
+```
+
+Keep it open while you work — browse source clips, check renders, and compare outputs without leaving the terminal workflow.
+
 ## License
 
 [MIT](LICENSE)
