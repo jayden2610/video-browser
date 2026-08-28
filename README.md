@@ -74,7 +74,7 @@ python server.py /path/to/videouse/out --open
 
 Keep it open while you keep/kill. Hover a card to preview, click for fullscreen. Newest files sort first.
 
-Agent workflow (locate this repo, scan `out/`, inventory via `/api/media`, visually review with `videoReview` rather than screenshots of a playing player) lives in `.cursor/skills/review-renders/SKILL.md`.
+Agent workflow lives in `.cursor/skills/video-browser/SKILL.md`. After every successful render, follow that skill: scan `out/`, list via `/api/media`, watch in the grid (or `videoReview` on the files). Do not screenshot a playing player.
 
 ## License
 

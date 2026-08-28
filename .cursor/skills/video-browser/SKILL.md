@@ -1,13 +1,15 @@
 ---
-name: review-renders
-description: Open Video Browser on a videouse out/ folder (or any render dir) to visually review newly rendered videos. Use when the user has new out/*.mp4 files, wants to inspect a batch, says open video browser, review renders, look at the new clips, or keep/kill after produce.py.
+name: video-browser
+description: Open Video Browser on a videouse out/ folder (or any render dir) to visually review newly rendered videos. Use after produce.py succeeds, when the user has new out/*.mp4 files, wants to inspect a batch, says open video browser, review renders, look at the new clips, or keep/kill.
 ---
 
-# Review renders in Video Browser
+# Video Browser
 
 Default job: five (or N) new `produce.py` outputs, open a visual grid, inspect them. Do not open a file manager. Do not scan the whole videouse tree.
 
 This skill is for **reviewing finished clips**. Mechanical gates (face, cards, duration, watermarks) still run from videouse tools. Human keep/kill on a phone is still the inspire gate.
+
+After every successful render or batch, run this skill before keep/kill or copying to `all_rendered/`.
 
 ## Pick the folder
 
