@@ -5,6 +5,7 @@ Usage:
     python server.py                  # scan current directory
     python server.py /path/to/folder  # scan specific folder
     python server.py --port 9000      # custom port
+    python server.py --open out       # scan a folder and open the UI
 """
 
 import argparse
@@ -13,7 +14,9 @@ import json
 import os
 import socketserver
 import sys
+import threading
 import urllib.parse
+import webbrowser
 from pathlib import Path
 
 VIDEO_EXTS = {".mp4", ".mov", ".avi", ".mkv", ".webm", ".m4v", ".flv", ".wmv"}
@@ -45,10 +48,11 @@ def scan_media(root: Path):
                 "path": str(rel).replace("\\", "/"),
                 "folder": folder,
                 "size": stat.st_size,
+                "mtime": stat.st_mtime,
                 "ext": ext.lstrip("."),
                 "type": "video" if is_video else "audio",
             })
-    files.sort(key=lambda f: (f["folder"], f["name"]))
+    files.sort(key=lambda f: (-f["mtime"], f["folder"], f["name"]))
     return files
 
 
@@ -145,6 +149,7 @@ def main():
     parser = argparse.ArgumentParser(description="Video Browser — local media file browser")
     parser.add_argument("folder", nargs="?", default=".", help="Folder to scan (default: current directory)")
     parser.add_argument("--port", "-p", type=int, default=8765, help="Port to serve on (default: 8765)")
+    parser.add_argument("--open", action="store_true", help="Open the UI in the default browser")
     args = parser.parse_args()
 
     root = Path(args.folder).resolve()
@@ -164,6 +169,11 @@ def main():
     print(f"  Serving at http://localhost:{args.port}")
     print(f"  Press Ctrl+C to stop\n")
 
+    url = f"http://localhost:{args.port}"
+    if args.open:
+        threading.Timer(0.4, lambda: webbrowser.open(url)).start()
+
+    socketserver.TCPServer.allow_reuse_address = True
     with socketserver.TCPServer(("", args.port), MediaHandler) as httpd:
         try:
             httpd.serve_forever()

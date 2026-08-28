@@ -63,15 +63,18 @@ Options:
 3. Serves the actual media files at `/file/...` with range request support
 4. `index.html` is a single-file dark-themed web UI that fetches the API and renders a browsable grid
 
-## Use with video-use
+## Use with videouse
 
-When working on video projects (e.g. video-use, hyperframes), run the browser in the background to preview and manage source files:
+After a batch render, point the browser at `out/` (the review bucket), not the repo root. Scanning the whole project pulls hour-long `source/` tapes into the grid.
 
 ```bash
-python server.py C:\path\to\video\project
+# from this repo, against a videouse checkout
+python server.py /path/to/videouse/out --open
 ```
 
-Keep it open while you work — browse source clips, check renders, and compare outputs without leaving the terminal workflow.
+Keep it open while you keep/kill. Hover a card to preview, click for fullscreen. Newest files sort first.
+
+Agent workflow (locate this repo, scan `out/`, inventory via `/api/media`, visually review with `videoReview` rather than screenshots of a playing player) lives in `.cursor/skills/review-renders/SKILL.md`.
 
 ## License
 

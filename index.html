@@ -28,6 +28,7 @@
   .filter-btn { padding: 6px 14px; border-radius: 6px; border: none; background: transparent; color: var(--text2); font-size: 12px; cursor: pointer; transition: all 0.15s; }
   .filter-btn:hover { background: var(--surface2); color: var(--text); }
   .filter-btn.active { background: var(--accent); color: #000; font-weight: 600; }
+  .sort-select { padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border); background: var(--surface2); color: var(--text); font-size: 12px; }
 
   /* Layout */
   .main { display: flex; flex: 1; overflow: hidden; }
@@ -94,6 +95,11 @@
     <button class="filter-btn" data-filter="video">Video</button>
     <button class="filter-btn" data-filter="audio">Audio</button>
   </div>
+  <select class="sort-select" id="sort">
+    <option value="newest">Newest</option>
+    <option value="name">Name</option>
+    <option value="size">Size</option>
+  </select>
 </div>
 
 <div class="main">
@@ -114,6 +120,7 @@ let media = [];
 let activeFolder = "_all";
 let activeFilter = "all";
 let searchQuery = "";
+let sortMode = "newest";
 
 function fmtSize(b) {
   if (b < 1024) return b + " B";
@@ -125,6 +132,16 @@ function fmtSize(b) {
 function folderIcon(name) {
   const icons = {};
   return icons[name] || "📁";
+}
+
+function fmtAgo(ts) {
+  if (!ts) return "";
+  const s = Math.max(0, Date.now() / 1000 - ts);
+  if (s < 60) return "just now";
+  if (s < 3600) return Math.floor(s / 60) + "m ago";
+  if (s < 86400) return Math.floor(s / 3600) + "h ago";
+  if (s < 86400 * 7) return Math.floor(s / 86400) + "d ago";
+  return new Date(ts * 1000).toISOString().slice(0, 10);
 }
 
 function renderSidebar() {
@@ -148,12 +165,16 @@ function renderSidebar() {
 }
 
 function filtered() {
-  return media.filter(m => {
+  const items = media.filter(m => {
     if (activeFolder !== "_all" && m.folder !== activeFolder) return false;
     if (activeFilter !== "all" && m.type !== activeFilter) return false;
     if (searchQuery && !m.name.toLowerCase().includes(searchQuery) && !m.folder.toLowerCase().includes(searchQuery)) return false;
     return true;
   });
+  if (sortMode === "newest") items.sort((a, b) => (b.mtime || 0) - (a.mtime || 0));
+  else if (sortMode === "size") items.sort((a, b) => (b.size || 0) - (a.size || 0));
+  else items.sort((a, b) => a.name.localeCompare(b.name));
+  return items;
 }
 
 function renderGrid() {
@@ -175,7 +196,7 @@ function renderGrid() {
       <div class="card-thumb">${thumb}</div>
       <div class="card-info">
         <div class="card-name" title="${m.name}">${m.name}</div>
-        <div class="card-meta">${badge}<span>${fmtSize(m.size)}</span><span>${m.folder}</span></div>
+        <div class="card-meta">${badge}<span>${fmtSize(m.size)}</span><span>${fmtAgo(m.mtime)}</span><span>${m.folder}</span></div>
       </div>
     </div>`;
   }).join("");
@@ -221,6 +242,11 @@ document.querySelectorAll(".filter-btn").forEach(btn => {
     renderGrid();
   };
 });
+
+document.getElementById("sort").onchange = e => {
+  sortMode = e.target.value;
+  renderGrid();
+};
 
 fetch("/api/media").then(r => r.json()).then(d => { media = d; render(); });
 </script>
